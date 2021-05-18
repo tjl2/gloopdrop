@@ -11,6 +11,7 @@ import GameplayKit
 class GameScene: SKScene {
     
     let player = Player()
+    let playerSpeed: CGFloat = 1.5
     
     override func didMove(to view: SKView) {
         // Set up background
@@ -37,10 +38,14 @@ class GameScene: SKScene {
     // MARK: - TOUCH HANDLING
     
     func touchDown(atPoint pos : CGPoint ) {
+        // Calculate theh speed based on currrent position and tap location
+        let distance = hypot(pos.x-player.position.x, pos.y-player.position.y)
+        let calculatedSpeed = TimeInterval(distance / playerSpeed) / 255
+        print(" distance: \(distance) \n calculatedSpeed: \(calculatedSpeed)")
         if pos.x < player.position.x {
-            player.moveToPosition(pos: pos, direction: "L", speed: 1.0)
+            player.moveToPosition(pos: pos, direction: "L", speed: calculatedSpeed)
         } else {
-            player.moveToPosition(pos: pos, direction: "R", speed: 1.0)
+            player.moveToPosition(pos: pos, direction: "R", speed: calculatedSpeed)
         }
     }
     
