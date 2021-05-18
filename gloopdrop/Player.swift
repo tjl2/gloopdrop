@@ -40,6 +40,13 @@ class Player: SKSpriteNode {
     
     // MARK: - METHODS
     
+    func setupConstraints(floor: CGFloat) {
+        let range = SKRange(lowerLimit: floor, upperLimit: floor)
+        let lockToPlatform = SKConstraint.positionY(range)
+        
+        constraints = [ lockToPlatform ]
+    }
+    
     func walk() {
         // Check for textures
         guard let walkTextures = walkTextures else {

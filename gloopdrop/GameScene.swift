@@ -29,8 +29,8 @@ class GameScene: SKScene {
         
         // Set up player
         player.position = CGPoint(x: size.width/2, y: foreground.frame.maxY)
+        player.setupConstraints(floor: foreground.frame.maxY)
         addChild(player)
-        
         player.walk()
     }
     
