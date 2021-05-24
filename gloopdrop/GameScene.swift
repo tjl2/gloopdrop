@@ -12,7 +12,7 @@ class GameScene: SKScene {
     
     let player = Player()
     let playerSpeed: CGFloat = 1.5
-    var level: Int = 8
+    var level: Int = 1
     var numberOfDrops: Int = 10
     var dropSpeed: CGFloat = 1.0
     var minDropSpeed: CGFloat = 0.12 // (fastest drop)
