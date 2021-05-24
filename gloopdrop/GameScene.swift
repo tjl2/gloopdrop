@@ -12,6 +12,11 @@ class GameScene: SKScene {
     
     let player = Player()
     let playerSpeed: CGFloat = 1.5
+    var level: Int = 8
+    var numberOfDrops: Int = 10
+    var dropSpeed: CGFloat = 1.0
+    var minDropSpeed: CGFloat = 0.12 // (fastest drop)
+    var maxDropSpeed: CGFloat = 1.0 // (slowest drop)
     
     override func didMove(to view: SKView) {
         // Set up background
@@ -41,11 +46,33 @@ class GameScene: SKScene {
     // MARK: - GAME FUNCTIONS
     
     func spawnMultipleGloops() {
+        // Set up drop speed
+        dropSpeed = 1 / (CGFloat(level) + (CGFloat(level) / CGFloat(numberOfDrops)))
+        if dropSpeed < minDropSpeed {
+            dropSpeed = minDropSpeed
+        } else if dropSpeed > maxDropSpeed {
+            dropSpeed = maxDropSpeed
+        }
+        
+        // Set the number of drops based on the level
+        switch level {
+        case 1, 2, 3, 4, 5:
+            numberOfDrops = level * 10
+        case 6:
+            numberOfDrops = 75
+        case 7:
+            numberOfDrops = 100
+        case 8:
+            numberOfDrops = 150
+        default:
+            numberOfDrops = 150
+        }
+        
         // Set up repeating action
-        let wait = SKAction.wait(forDuration: TimeInterval(1.0))
+        let wait = SKAction.wait(forDuration: TimeInterval(dropSpeed))
         let spawn = SKAction.run { [unowned self] in self.spawnGloop() }
         let sequence = SKAction.sequence([wait, spawn])
-        let repeatAction = SKAction.repeat(sequence, count: 10)
+        let repeatAction = SKAction.repeat(sequence, count: numberOfDrops)
         
         // Run action
         run(repeatAction, withKey: "gloop")
