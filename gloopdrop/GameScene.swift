@@ -12,7 +12,7 @@ class GameScene: SKScene {
     
     let player = Player()
     let playerSpeed: CGFloat = 1.5
-    // Playerr movement
+    // Player movement
     var movingPlayer = false
     var lastPosition: CGPoint?
     var level: Int = 1
@@ -20,8 +20,14 @@ class GameScene: SKScene {
     var dropSpeed: CGFloat = 1.0
     var minDropSpeed: CGFloat = 0.12 // (fastest drop)
     var maxDropSpeed: CGFloat = 1.0 // (slowest drop)
+    // Levels
+    var scoreLabel: SKLabelNode = SKLabelNode()
+    var levelLabel: SKLabelNode = SKLabelNode()
     
     override func didMove(to view: SKView) {
+        // Set up the physics world contact delegate
+        physicsWorld.contactDelegate = self
+        
         // Set up background
         let background = SKSpriteNode(imageNamed: "background_1")
         background.position = CGPoint(x: 0, y: 0)
@@ -37,7 +43,13 @@ class GameScene: SKScene {
         // Add physics body
         foreground.physicsBody = SKPhysicsBody(edgeLoopFrom: foreground.frame)
         foreground.physicsBody?.affectedByGravity = false
+        foreground.physicsBody?.categoryBitMask = PhysicsCategory.foreground
+        foreground.physicsBody?.contactTestBitMask = PhysicsCategory.collectible
+        foreground.physicsBody?.collisionBitMask = PhysicsCategory.none
         addChild(foreground)
+        
+        // Set up User Interface
+        setupLabels()
         
         // Set up player
         player.position = CGPoint(x: size.width/2, y: foreground.frame.maxY)
@@ -98,6 +110,33 @@ class GameScene: SKScene {
         collectible.drop(dropSpeed: TimeInterval(1.0), floorLevel: player.frame.minY)
     }
     
+    func setupLabels() {
+        // SCORE LABEL
+        scoreLabel.name = "score"
+        scoreLabel.fontName = "Nosifer"
+        scoreLabel.fontColor = .yellow
+        scoreLabel.horizontalAlignmentMode = .right
+        scoreLabel.verticalAlignmentMode = .center
+        scoreLabel.zPosition = Layer.ui.rawValue
+        scoreLabel.position = CGPoint(x: frame.maxX - 50, y: viewTop() - 100)
+        // Set the text and add the label node to scene
+        scoreLabel.text = "Score: 0"
+        addChild(scoreLabel)
+        
+        // LEVEL LABEL
+        levelLabel.name = "level"
+        levelLabel.fontName = "Nosifer"
+        levelLabel.fontColor = .yellow
+        levelLabel.fontSize = 35.0
+        levelLabel.verticalAlignmentMode = .center
+        levelLabel.horizontalAlignmentMode = .left
+        levelLabel.zPosition = Layer.ui.rawValue
+        levelLabel.position = CGPoint(x: frame.minX + 50, y: viewTop() - 100)
+        // Set the text and add the label node to scene
+        levelLabel.text = "Level: \(level)"
+        addChild(levelLabel)
+    }
+    
     // MARK: - TOUCH HANDLING
     
     func touchDown(atPoint pos : CGPoint ) {
@@ -144,5 +183,40 @@ class GameScene: SKScene {
     
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         for t in touches { self.touchUp(atPoint: t.location(in: self)) }
+    }
+}
+
+// MARK: - COLLISION DETECTION
+
+// COLLISION DETECTION METHODS START HERE
+
+extension GameScene: SKPhysicsContactDelegate {
+    func didBegin(_ contact: SKPhysicsContact) {
+        // Check collision bodies
+        let collision = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
+        
+        // Did the [PLAYER] collide with the [COLLECTIBLE]?
+        if collision == PhysicsCategory.player | PhysicsCategory.collectible {
+            print("player hit collectible")
+            // Find out which body is attached do the collectible node
+            let body = contact.bodyA.categoryBitMask == PhysicsCategory.collectible ?
+                contact.bodyA.node : contact.bodyB.node
+            // Verify the object is a collectible and run the .collected() function
+            if let sprite = body as? Collectible {
+                sprite.collected()
+            }
+        }
+        
+        // Or did the [COLLECTIBLE] collide with the [FOREGROUND]?
+        if collision == PhysicsCategory.foreground | PhysicsCategory.collectible {
+            print("collectible hit foreground")
+            // Find out which body is attached do the collectible node
+            let body = contact.bodyA.categoryBitMask == PhysicsCategory.collectible ?
+                contact.bodyA.node : contact.bodyB.node
+            // Verify the object is a collectible and run the .missed() function
+            if let sprite = body as? Collectible {
+                sprite.missed()
+            }
+        }
     }
 }

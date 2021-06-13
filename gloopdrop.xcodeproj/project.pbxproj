@@ -15,6 +15,7 @@
 		229A1790265124500033B459 /* Player.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229A178F265124500033B459 /* Player.swift */; };
 		229A1793265125040033B459 /* SpriteKitHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229A1792265125040033B459 /* SpriteKitHelper.swift */; };
 		229A179626545EF90033B459 /* Collectible.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229A179526545EF90033B459 /* Collectible.swift */; };
+		22B7C1C4267638AD006FD8CC /* Nosifer-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22B7C1C3267638AD006FD8CC /* Nosifer-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		229A178F265124500033B459 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		229A1792265125040033B459 /* SpriteKitHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteKitHelper.swift; sourceTree = "<group>"; };
 		229A179526545EF90033B459 /* Collectible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Collectible.swift; sourceTree = "<group>"; };
+		22B7C1C3267638AD006FD8CC /* Nosifer-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Nosifer-Regular.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,9 +70,18 @@
 				2263D08E26448D8F007FFABC /* Info.plist */,
 				229A178F265124500033B459 /* Player.swift */,
 				229A179526545EF90033B459 /* Collectible.swift */,
+				22B7C1C2267637FE006FD8CC /* Fonts */,
 				229A1792265125040033B459 /* SpriteKitHelper.swift */,
 			);
 			path = gloopdrop;
+			sourceTree = "<group>";
+		};
+		22B7C1C2267637FE006FD8CC /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				22B7C1C3267638AD006FD8CC /* Nosifer-Regular.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -131,6 +142,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2263D08B26448D8E007FFABC /* Main.storyboard in Resources */,
+				22B7C1C4267638AD006FD8CC /* Nosifer-Regular.ttf in Resources */,
 				2263D08D26448D8F007FFABC /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
