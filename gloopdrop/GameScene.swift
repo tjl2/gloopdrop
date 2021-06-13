@@ -147,7 +147,9 @@ class GameScene: SKScene {
     }
     
     func gameOver() {
-        // Remove rrepeatable action on main scene
+        // Start the playerr die animation
+        player.die()
+        // Remove repeatable action on main scene
         removeAction(forKey: "gloop")
         // Loop thrrought child nodes and stop actions on collectibles
         enumerateChildNodes(withName: "//co_*") {
