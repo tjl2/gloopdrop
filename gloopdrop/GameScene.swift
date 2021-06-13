@@ -15,7 +15,16 @@ class GameScene: SKScene {
     // Player movement
     var movingPlayer = false
     var lastPosition: CGPoint?
-    var level: Int = 1
+    var level: Int = 1 {
+        didSet {
+            levelLabel.text = "Level: \(level)"
+        }
+    }
+    var score: Int = 0 {
+        didSet {
+            scoreLabel.text = "Score: \(score)"
+        }
+    }
     var numberOfDrops: Int = 10
     var dropSpeed: CGFloat = 1.0
     var minDropSpeed: CGFloat = 0.12 // (fastest drop)
@@ -204,6 +213,7 @@ extension GameScene: SKPhysicsContactDelegate {
             // Verify the object is a collectible and run the .collected() function
             if let sprite = body as? Collectible {
                 sprite.collected()
+                score += level
             }
         }
         
