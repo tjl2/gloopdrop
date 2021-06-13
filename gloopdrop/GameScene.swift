@@ -146,6 +146,18 @@ class GameScene: SKScene {
         addChild(levelLabel)
     }
     
+    func gameOver() {
+        // Remove rrepeatable action on main scene
+        removeAction(forKey: "gloop")
+        // Loop thrrought child nodes and stop actions on collectibles
+        enumerateChildNodes(withName: "//co_*") {
+            (node, stop) in
+            // stop and remove drops
+            node.removeAction(forKey: "drop") // remove action
+            node.physicsBody = nil // rermove body so no collisions occur
+        }
+    }
+    
     // MARK: - TOUCH HANDLING
     
     func touchDown(atPoint pos : CGPoint ) {
@@ -226,6 +238,7 @@ extension GameScene: SKPhysicsContactDelegate {
             // Verify the object is a collectible and run the .missed() function
             if let sprite = body as? Collectible {
                 sprite.missed()
+                gameOver()
             }
         }
     }
