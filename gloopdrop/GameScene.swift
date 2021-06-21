@@ -32,6 +32,8 @@ class GameScene: SKScene {
     // Levels
     var scoreLabel: SKLabelNode = SKLabelNode()
     var levelLabel: SKLabelNode = SKLabelNode()
+    // Game states
+    var gameInProgress = false
     
     override func didMove(to view: SKView) {
         // Set up the physics world contact delegate
@@ -64,21 +66,29 @@ class GameScene: SKScene {
         player.position = CGPoint(x: size.width/2, y: foreground.frame.maxY)
         player.setupConstraints(floor: foreground.frame.maxY)
         addChild(player)
-        player.walk()
+        // player.walk() - NOW MOVED DO spawnMultipleGloops
         
-        // Set up game
-        spawnMultipleGloops()
+        // Set up game – NOW MOVED TO touchDown SO THAT GAME STARTS ON TAP
+        //spawnMultipleGloops()
     }
     
     // MARK: - GAME FUNCTIONS
     
     func spawnMultipleGloops() {
+        // Start player walk animation
+        player.walk()
         // Set up drop speed
         dropSpeed = 1 / (CGFloat(level) + (CGFloat(level) / CGFloat(numberOfDrops)))
         if dropSpeed < minDropSpeed {
             dropSpeed = minDropSpeed
         } else if dropSpeed > maxDropSpeed {
             dropSpeed = maxDropSpeed
+        }
+        
+        // Reset the level and score
+        if gameInProgress == false {
+            score = 0
+            level = 1
         }
         
         // Set the number of drops based on the level
@@ -103,6 +113,8 @@ class GameScene: SKScene {
         
         // Run action
         run(repeatAction, withKey: "gloop")
+        // Update game state
+        gameInProgress = true
     }
     
     func spawnGloop() {
@@ -158,11 +170,46 @@ class GameScene: SKScene {
             node.removeAction(forKey: "drop") // remove action
             node.physicsBody = nil // rermove body so no collisions occur
         }
+        // Update game state
+        gameInProgress = false
+        resetPlayerPosition()
+        popRemainingDrops()
+    }
+    
+    func resetPlayerPosition() {
+        let resetPoint = CGPoint(x: frame.midX, y: player.position.y)
+        let distance = hypot(resetPoint.x-player.position.x, 0)
+        let calculatedSpeed = TimeInterval(distance / (playerSpeed * 2)) / 255
+        
+        if player.position.x > frame.midX {
+            player.moveToPosition(pos: resetPoint, direction: "L", speed: calculatedSpeed)
+        } else {
+            player.moveToPosition(pos: resetPoint, direction: "R", speed: calculatedSpeed)
+        }
+    }
+    
+    func popRemainingDrops() {
+        var i = 0
+        enumerateChildNodes(withName: "//co_*") {
+            (node, stop) in
+            // Pop remaining drops in sequence
+            let initialWait = SKAction.wait(forDuration: 1.0)
+            let wait = SKAction.wait(forDuration: TimeInterval(0.15 * CGFloat(i)))
+            
+            let removeFromParent = SKAction.removeFromParent()
+            let actionSequence = SKAction.sequence([initialWait, wait, removeFromParent])
+            node.run(actionSequence)
+            i += 1
+        }
     }
     
     // MARK: - TOUCH HANDLING
     
     func touchDown(atPoint pos : CGPoint ) {
+        if gameInProgress == false {
+            spawnMultipleGloops()
+            return
+        }
         let touchedNode = atPoint(pos)
         if touchedNode.name == "player" {
             movingPlayer = true
