@@ -26,6 +26,8 @@ class GameScene: SKScene {
         }
     }
     var numberOfDrops: Int = 10
+    var dropsExpected = 10
+    var dropsCollected = 0
     var dropSpeed: CGFloat = 1.0
     var minDropSpeed: CGFloat = 0.12 // (fastest drop)
     var maxDropSpeed: CGFloat = 1.0 // (slowest drop)
@@ -105,6 +107,10 @@ class GameScene: SKScene {
             numberOfDrops = 150
         }
         
+        // Reset and update the collected and expected drop count
+        dropsCollected = 0
+        dropsExpected = numberOfDrops
+        
         // Set up repeating action
         let wait = SKAction.wait(forDuration: TimeInterval(dropSpeed))
         let spawn = SKAction.run { [unowned self] in self.spawnGloop() }
@@ -129,6 +135,18 @@ class GameScene: SKScene {
         collectible.position = CGPoint(x: randomX, y: player.position.y * 2.5)
         addChild(collectible)
         collectible.drop(dropSpeed: TimeInterval(1.0), floorLevel: player.frame.minY)
+    }
+    
+    func checkForRemainingDrops() {
+        if dropsCollected == dropsExpected {
+            nextLevel()
+        }
+    }
+    
+    func nextLevel() {
+        let wait = SKAction.wait(forDuration: 2.25)
+        run(wait, completion: {[unowned self] in self.level += 1
+                                self.spawnMultipleGloops()})
     }
     
     func setupLabels() {
@@ -274,7 +292,9 @@ extension GameScene: SKPhysicsContactDelegate {
             // Verify the object is a collectible and run the .collected() function
             if let sprite = body as? Collectible {
                 sprite.collected()
+                dropsCollected += 1
                 score += level
+                checkForRemainingDrops()
             }
         }
         
