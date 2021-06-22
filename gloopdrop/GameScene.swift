@@ -72,6 +72,9 @@ class GameScene: SKScene {
         
         // Set up game – NOW MOVED TO touchDown SO THAT GAME STARTS ON TAP
         //spawnMultipleGloops()
+        
+        // Show message
+        showMessage("Tap to start game")
     }
     
     // MARK: - GAME FUNCTIONS
@@ -121,6 +124,8 @@ class GameScene: SKScene {
         run(repeatAction, withKey: "gloop")
         // Update game state
         gameInProgress = true
+        // Hide 'start game' or 'get ready' message
+        hideMessage()
     }
     
     func spawnGloop() {
@@ -144,6 +149,7 @@ class GameScene: SKScene {
     }
     
     func nextLevel() {
+        showMessage("Get Ready!")
         let wait = SKAction.wait(forDuration: 2.25)
         run(wait, completion: {[unowned self] in self.level += 1
                                 self.spawnMultipleGloops()})
@@ -176,7 +182,43 @@ class GameScene: SKScene {
         addChild(levelLabel)
     }
     
+    func showMessage(_ message: String) {
+        // Set up message label
+        let messageLabel = SKLabelNode()
+        messageLabel.name = "message"
+        messageLabel.position = CGPoint(x: frame.midX, y: player.frame.maxY + 100)
+        messageLabel.zPosition = Layer.ui.rawValue
+        messageLabel.numberOfLines = 2
+        
+        // Set up attrributed text
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.alignment = .center
+        
+        let attributes: [NSAttributedString.Key: Any] = [
+            .foregroundColor: SKColor(red: 251.0/255.0, green: 155.0/255.0, blue: 24.0/255.0, alpha: 1.0),
+            .backgroundColor: UIColor.clear,
+            .font: UIFont(name: "Nosifer", size: 45.0)!,
+            .paragraphStyle: paragraph
+        ]
+        
+        messageLabel.attributedText = NSAttributedString(string: message, attributes: attributes)
+        
+        // Run a fade action and add the label to the scene
+        messageLabel.run(SKAction.fadeIn(withDuration: 0.25))
+        addChild(messageLabel)
+    }
+    
+    func hideMessage() {
+        // Remove message label if it exists
+        if let messageLabel = childNode(withName: "//message") as? SKLabelNode {
+            messageLabel.run(SKAction.sequence([SKAction.fadeOut(withDuration: 0.25),
+                                                SKAction.removeFromParent()]))
+        }
+    }
+    
     func gameOver() {
+        // Show message
+        showMessage("Game Over\nTap to try again")
         // Start the playerr die animation
         player.die()
         // Remove repeatable action on main scene
