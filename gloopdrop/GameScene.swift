@@ -5,6 +5,7 @@
 //  Created by Tim Littlemore on 06/05/2021.
 //
 
+import AVFoundation
 import SpriteKit
 import GameplayKit
 
@@ -34,10 +35,27 @@ class GameScene: SKScene {
     // Levels
     var scoreLabel: SKLabelNode = SKLabelNode()
     var levelLabel: SKLabelNode = SKLabelNode()
+    // Audio nodes
+    let musicAudioNode = SKAudioNode(fileNamed: "music.mp3")
     // Game states
     var gameInProgress = false
     
     override func didMove(to view: SKView) {
+        // Decrease the audio engine's volume (so we can fade in the music)
+        audioEngine.mainMixerNode.outputVolume = 0.0
+        // Set up the background music audio node
+        musicAudioNode.autoplayLooped = true
+        musicAudioNode.isPositional = false
+        // Add the audio node to the scene
+        addChild(musicAudioNode)
+        // Use an action to adjust the audio node's volume to 0
+        musicAudioNode.run(SKAction.changeVolume(to: 0.0, duration: 0.0))
+        // Run a delayed action on tne scene that fades in the music
+        run(SKAction.wait(forDuration: 1.0), completion: { [unowned self] in
+            self.audioEngine.mainMixerNode.outputVolume = 1.0
+            self.musicAudioNode.run(SKAction.changeVolume(to: 0.75, duration: 2.0))
+        })
+        
         // Set up the physics world contact delegate
         physicsWorld.contactDelegate = self
         
